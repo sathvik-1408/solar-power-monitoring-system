@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Monitoring Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🌞 Solar Monitoring Dashboard</h1>
+        <div class="grid">
+            <div class="card" id="voltageCard">
+                <h2>Voltage</h2>
+                <p id="voltage">-- V</p>
+            </div>
+            <div class="card" id="currentCard">
+                <h2>Current</h2>
+                <p id="current">-- A</p>
+            </div>
+            <div class="card" id="temperatureCard">
+                <h2>Temperature</h2>
+                <p id="temperature">-- °C</p>
+            </div>
+            <div class="card" id="luxCard">
+                <h2>Light Intensity</h2>
+                <p id="lux">-- Lux</p>
+            </div>
+        </div>
+        <canvas id="historyChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let chart;
+        async function fetchData() {
+            try {
+                let response = await fetch("/data");
+                let data = await response.json();
+
+                document.getElementById("voltage").textContent = `${data.field1} V`;
+                document.getElementById("current").textContent = `${data.field2} A`;
+                document.getElementById("temperature").textContent = `${data.field3} °C`;
+                document.getElementById("lux").textContent = `${data.field4} Lux`;
+
+                updateAlarms(data);
+                updateChart(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        function updateAlarms(data) {
+            document.getElementById("voltageCard").style.background = data.field1 > 50 ? "red" : "#1E1E1E";
+            document.getElementById("temperatureCard").style.background = data.field3 > 50 ? "red" : "#1E1E1E";
+        }
+
+        function updateChart(data) {
+            if (!chart) {
+                let ctx = document.getElementById("historyChart").getContext("2d");
+                chart = new Chart(ctx, {
+                    type: "line",
+                    data: { labels: [], datasets: [{ label: "Voltage", data: [] }] },
+                });
+            }
+            chart.data.labels.push(new Date().toLocaleTimeString());
+            chart.data.datasets[0].data.push(data.field1);
+            chart.update();
+        }
+
+        setInterval(fetchData, 5000);
+        fetchData();
+    </script>
+</body>
+</html>
