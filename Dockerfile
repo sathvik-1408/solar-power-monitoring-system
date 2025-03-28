@@ -8,8 +8,9 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-pip install numpy
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir numpy pandas scikit-learn xgboost
+
 # Copy the rest of the application
 COPY . .
 
