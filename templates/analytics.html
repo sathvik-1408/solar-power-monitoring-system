@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Solar Panel Analytics</h1>
+        <div class="grid">
+            <div class="card"><h2>Predicted Lux</h2><p id="predictedLux">-- Lux</p></div>
+            <div class="card"><h2>Overheating Risk</h2><p id="overheatRisk">--</p></div>
+            <div class="card"><h2>Maintenance Needed</h2><p id="maintenance">--</p></div>
+            <div class="card"><h2>Voltage Status</h2><p id="voltageStatus">--</p></div>
+            <div class="card"><h2>Current Status</h2><p id="currentStatus">--</p></div>
+            <div class="card"><h2>Temperature Status</h2><p id="temperatureStatus">--</p></div>
+        </div>
+
+        <button onclick="location.href='/'">Back to Dashboard</button>
+    </div>
+
+    <script>
+        async function fetchAnalytics() {
+            let response = await fetch("/analytics-data");
+            let data = await response.json();
+            
+            document.getElementById("predictedLux").textContent = `${data.predicted_lux.toFixed(2)} Lux`;
+            document.getElementById("overheatRisk").textContent = data.overheating_risk;
+            document.getElementById("maintenance").textContent = data.maintenance_needed;
+            document.getElementById("voltageStatus").textContent = data.voltage_status;
+            document.getElementById("currentStatus").textContent = data.current_status;
+            document.getElementById("temperatureStatus").textContent = data.temperature_status;
+        }
+        
+        fetchAnalytics();
+    </script>
+</body>
+</html>
